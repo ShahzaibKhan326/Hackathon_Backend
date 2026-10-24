@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Attendance = require('../models/Attendance');
 const Employee = require('../models/Employee');
 const CompanySettings = require('../models/CompanySettings');
@@ -7,8 +8,10 @@ const getTodayDateStr = () => new Date().toISOString().split('T')[0];
 const checkIn = async (req, res, next) => {
   try {
     const { source, location } = req.body;
+    const rawUserId = req.user.id || req.user._id;
+    const userId = new mongoose.Types.ObjectId(rawUserId);
     
-    const employee = await Employee.findOne({ user: req.user._id });
+    const employee = await Employee.findOne({ user: userId });
     if (!employee) {
       return res.status(404).json({ success: false, message: 'Employee profile not found for this user' });
     }
@@ -38,7 +41,7 @@ const checkIn = async (req, res, next) => {
 
     const attendance = await Attendance.create({
       employee: employee._id,
-      user: req.user._id,
+      user: userId,
       date: today,
       checkIn: {
         time: now,
@@ -61,7 +64,10 @@ const checkIn = async (req, res, next) => {
 
 const checkOut = async (req, res, next) => {
   try {
-    const employee = await Employee.findOne({ user: req.user._id });
+    const rawUserId = req.user.id || req.user._id;
+    const userId = new mongoose.Types.ObjectId(rawUserId);
+    
+    const employee = await Employee.findOne({ user: userId });
     if (!employee) {
       return res.status(404).json({ success: false, message: 'Employee profile not found' });
     }
@@ -109,7 +115,9 @@ const getAttendance = async (req, res, next) => {
     if (date) query.date = date;
 
     if (req.user.role === 'employee') {
-      const employee = await Employee.findOne({ user: req.user._id });
+      const rawUserId = req.user.id || req.user._id;
+      const userId = new mongoose.Types.ObjectId(rawUserId);
+      const employee = await Employee.findOne({ user: userId });
       if (!employee) return res.json({ success: true, count: 0, data: [] });
       query.employee = employee._id;
     } else if (department) {
