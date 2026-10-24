@@ -1,9 +1,13 @@
+const dns = require('dns')
+dns.setServers(['1.1.1.1','8.8.8.8'])
+
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const { seedAdmin } = require('./controllers/authController');
+
 
 // 1. Load Environment Variables
 dotenv.config();
