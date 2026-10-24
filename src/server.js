@@ -15,14 +15,14 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use('/api/employees', require('./routes/employeeRoutes'));
-
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
 // Mount Routes
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/employees', require('./routes/employeeRoutes'));
+app.use('/api/attendance', require('./routes/attendanceRoutes'));
 
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'HCM Lite API is running...' });
